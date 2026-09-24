@@ -98,3 +98,125 @@ Presenter - презентер содержит основную логику п
 `emit<T extends object>(event: string, data?: T): void` - инициализация события. При вызове события в метод передается название события и объект с данными, который будет использован как аргумент для вызова обработчика.  
 `trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void` - возвращает функцию, при вызове которой инициализируется требуемое в параметрах событие с передачей в него данных из второго параметра.
 
+#### Данные
+
+##### Интерфейсы товаров:
+
+interface IProduct {
+    id: string;
+    description: string;
+    image: string;
+    title: string;
+    category: string;
+    price: number | null;
+}
+
+Интерфейс покупателя:
+
+interface IBuyer {
+    payment: TPayment;
+    email: string;
+    phone: string;
+    address: string;
+}
+
+##### Модели данных:
+
+Используются для хранения товаров, доступных в приложении
+
+class Products {
+    items: IProduct[];
+    selectItem: IProduct | null;
+}
+
+  Поля класса:
+
+      * хранит массив всех товаров
+      * хранит товар, выбранный для подробного отображения
+
+  Методы класса:
+
+      * получение массива товаров из модели
+      getProducts(): IProduct [],
+      * сохранение массива товаров полученного в параметрах метода
+      saveProducts(products: IProduct[]): void,
+      * получение одного товара по его id;
+      getProductById(id:string): IProduct | undefined,
+      * сохранение товара для подробного отображения
+      saveSelectProduct(product: IProduct): void
+      * получение товара для подробного отображения
+      getSelectProduct(): IProduct | null
+
+Используется для хранения товаров, выбранных для покупки
+
+class Basket{
+    products: IProduct[];
+}
+
+  Поля класса:
+
+      * хранит массив всех товаров, выбранных покупателем
+
+  Методы класса:
+
+      * получение массива товаров, которые находятся в корзине
+      getBasketProducts(): IProduct[]
+      * добавление товара, который был получен в параметре, в массив корзины
+      addBasketProduct(product: IProduct): void
+      * удаление товара, полученного в параметре, из массива корзины
+      deleteBasketProduct(product: IProduct): void
+      * очистка корзины
+      clearBasket(): void
+      * получение стоимости всех товаров в корзине
+      getBasketTotal(): number
+      * получение количества товаров в корзине
+      getBasketProductsCount(): number
+      * проверка наличия товара в корзине по его id, полученного в параметр метода
+      getBasketProductById(id: string): boolean
+
+Данные покупателя, которые необходимо ввести при оформлении заказа
+
+class Buyer() {
+    payment: TPayment;
+    address: string;
+    email: string;
+    phone: string;
+}
+
+  Поля класса:
+
+      * хранит вид оплаты
+      * почтовый адреc
+      * электронный адрес
+      * телефон
+
+  Методы класса:
+      * получение всех данных покупателя
+      getBuyerData(): IBuyer,
+      * сохранение данных об адресе в модели
+      saveBuyerAddress(address: string): void,
+      * сохранение данных об электронном адресе в модели
+      saveBuyerEmail(email: string): void,
+      * сохранение данных о телефоне в модели
+      saveBuyerPhone(phone: string): void,
+      * метод, который проверяет данные покупателя и возвращает результат проверки
+      validateBuyer(): boolean | {},
+      * очистка данных покупателя
+      clearBuyer(): void,
+
+
+#### Слой коммуникации
+
+##### Класс Api
+
+Коммуникационный слой отвечает за получение данных с сервера и отправку данных на сервер.
+
+   Методы класса:
+
+      * get запрос на эндпоинт /product/ и возвращает объект, полученный от сервера, 
+        в котором находится массив товаров
+        get<T extends object>(uri: string)
+
+      * post запрос на эндпоинт /order/ и передаёт в него данные, полученные в 
+        параметрах метода, а возвращает объект, подтверждающий покупку на определенную сумму
+        post<T extends object>(uri: string, data: object, method: ApiPostMethods = 'POST')
