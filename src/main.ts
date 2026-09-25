@@ -35,14 +35,14 @@ if (selectProduct1 && selectProduct2) {
     basketModel.deleteBasketProduct(selectProduct1);
     console.log(`Получаем выбранный товар после удаления`, productsModel.getSelectProduct());
     console.log(`Получаем общую сумму выбранных товаров после удаления товара`, basketModel.getBasketTotal());
-    console.log(`Проверяем есть ли товар в корзине по id`, basketModel.getBasketProductById("412bcf81-7e75-4e70-bdb9-d3c73c9803b7"));
+    console.log(`Проверяем есть ли товар в корзине по id`, basketModel.isProductExists("412bcf81-7e75-4e70-bdb9-d3c73c9803b7"));
 
 }
 
 buyerModel.saveBuyerAddress("123 Main St");
 buyerModel.saveBuyerEmail("buyer@example.com");
 buyerModel.saveBuyerPhone("+79671234567");
-buyerModel.saveBuyerPayment("");
+buyerModel.saveBuyerPayment("card");
 
 console.log(`Информация о покупателе`, buyerModel. getBuyerData());
 console.log(`Валидация данных покупателя`, buyerModel. validateBuyer());
@@ -57,7 +57,7 @@ console.log(`Информация о покупателе после удале�
 const api = new Api(API_URL);
 const server = new Server(api);
 
-server.getProduct()
+server.getProducts()
     .then((products) => {
         productsModel.saveProducts(products.items);
         console.log(`Список товаров с сервера`, productsModel.getProducts());

@@ -172,7 +172,7 @@ class Basket{
       * получение количества товаров в корзине
       getBasketProductsCount(): number
       * проверка наличия товара в корзине по его id, полученного в параметр метода
-      getBasketProductById(id: string): boolean
+      isProductExists(id: string): boolean
 
 Данные покупателя, которые необходимо ввести при оформлении заказа
 

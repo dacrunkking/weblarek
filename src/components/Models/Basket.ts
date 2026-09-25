@@ -28,7 +28,7 @@ export  class Basket{
         return this.products.length;
     }
 
-    getBasketProductById(id: string): boolean {
+    isProductExists(id: string): boolean {
         return this.products.some((item) => item.id === id);
     }
 

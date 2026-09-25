@@ -8,7 +8,7 @@ export class Server {
         this.api = api;
     };
 
-    async getProduct(): Promise<IProductsResponse> {
+    async getProducts(): Promise<IProductsResponse> {
         return await this.api.get<IProductsResponse>('/product/')
     };
 

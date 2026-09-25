@@ -2,7 +2,7 @@ import {IBuyer, ValidationErrors} from "../../types"
 import { TPayment } from "../../types"
 
 export  class Buyer {
-    private payment: TPayment = "";
+    private payment: TPayment | '' = "";
     private address: string = "";
     private email: string = "";
     private phone: string = "";
