@@ -172,7 +172,7 @@ class Basket{
       * получение количества товаров в корзине
       getBasketProductsCount(): number
       * проверка наличия товара в корзине по его id, полученного в параметр метода
-      isProductExists(id: string): boolean
+      getBasketProductById(id: string): boolean
 
 Данные покупателя, которые необходимо ввести при оформлении заказа
 
@@ -220,3 +220,278 @@ class Buyer() {
       * post запрос на эндпоинт /order/ и передаёт в него данные, полученные в 
         параметрах метода, а возвращает объект, подтверждающий покупку на определенную сумму
         post<T extends object>(uri: string, data: object, method: ApiPostMethods = 'POST')
+#### Слой View
+
+Базовый класс для форм, содержит общий функционал.
+
+class BaseForm () {
+    submitFormButton: HTMLButtonElement;
+    errorFormElement: HTMLElement;
+}
+
+    Поля класса:
+        * хранит кнопку формы
+        * текст ошибки
+
+    Методы класса:
+        * информация об ошибке
+        set error (value: string),
+        * переключатель отправки формы
+        set valid(value: boolean)
+
+    constructor(container: HTMLElement) - Передает контейнер (HTML-элемент) блока order в родительский класс Component
+
+Класс для отображения списка товаров, стоимости в корзине и кнопки оформления заказа.
+
+class BasketViews () {
+    basketButtonOrder: HTMLButtonElement;
+    basketPrice: HTMLElement;
+    basketList: HTMLElement;
+}
+
+    Поля класса:
+        * хранит кнопку "Оформить" заказ
+        * информацию о сумме заказа в карзине
+        * список товаров в корзине
+
+    Методы класса:
+        * деактивирует кнопку
+        set buttonDisabled(value: boolean),
+        * информация о стоимости товаров
+        set price(value: string)
+        * отрисовка списка товаров в корзине
+        set items(values: HTMLElement[])
+
+    constructor(container: HTMLElement) - Передает контейнер (HTML-элемент) блока basket в родительский класс Component
+
+Базовый класс с общим для всех карточек функционалом.
+
+class Card () {
+    cardTitleElement: HTMLElement;
+    cardPriceElement: HTMLElement;
+}
+
+    Поля класса:
+        * хранит наименование товара
+        * цена товара
+
+    Методы класса:
+        * устанавливает наименование товара
+        set title(value: string),
+        * устанавливает цену товара
+        set price(value: number | null) 
+
+    constructor(container: HTMLElement) - Передает контейнер (HTML-элемент) блока Card в родительский класс Component
+
+
+Класс для отрисовки товара внутри корзины.
+
+class CardBasket () {
+    cardBasketDelete: HTMLButtonElement;
+    cardBasketIndex: HTMLElement;
+}
+
+    Поля класса:
+        * хранит номер товара в корзине
+        * хранит кнопку удаления товара из корзины
+
+    Методы класса:
+        * отвечает за изменение номера товара в корзине
+        set index(value: string)
+
+    constructor(container: HTMLElement, actions?: ICardBasketActions) - Привязывает событие удаления к переданному колбэку и передает контейнер (HTML-элемент) блока Card в родительский класс Component
+
+Класс для отрисовки карточки товара в каталоге (категория, фото).
+
+class CardCatalog () {
+    imageElement: HTMLImageElement;
+    categoryElement: HTMLElement;
+}
+
+    Поля класса:
+        * хранит категорию товара
+        * хранит изображение товара
+
+    Методы класса:
+        * отвечает за изменение категории товара
+        set category(value: string)
+        * отвечает за изменение изображения товара
+        set image(value: string)
+
+    constructor(container: HTMLElement, actions?: ICardActions) - Привязывает клик для открытия карточки и передает контейнер (HTML-элемент) блока card в родительский класс Component
+
+
+Класс для отрисовки подробной инфо. о товаре (категория, фото).
+
+class class CardPreview () {
+    imageElement: HTMLImageElement;
+    categoryElement: HTMLElement;
+    descriptionElement: HTMLElement;
+    buttonElement: HTMLButtonElement;
+}
+
+    Поля класса:
+        * хранит категорию товара
+        * хранит изображение товара
+        * хранит описание товара
+        * хранит кнопку товара
+
+    Методы класса:
+        * отвечает за изменение категории товара
+        set category(value: string)
+        * отвечает за изменение изображения товара
+        set image (value: string)
+        * отвечает за изменение кнопки карточки товара
+        set buttonText(value: string) 
+        * отвечает за изменение состояние кнопки действия товара
+        set buttonDisabled(value: boolean) 
+
+    constructor(container: HTMLElement, action?:ICardPreviewActions ) - Проверяет, передан ли обработчик onToggle в объекте action и принимает корневой HTML-элемент блока card
+
+Класс содержит контактные данные покупателя (телефон, адрес).
+
+class ContactForm () {
+    emailInputContactForm: HTMLInputElement;
+    phoneInputContactForm: HTMLInputElement;
+}
+
+    Поля класса:
+        * хранит адрес эл. почты
+        * хранит номер телефона
+
+    Методы класса:
+        * отвечает за поле ввода email
+         set email (value: string) 
+        * отвечает за поле ввода номер телефона
+        set phone (value: string) 
+
+    constructor(container: HTMLElement, actions?: IContactFormActions) - Привязывает клик для открытия карточки и передает контейнер (HTML-элемент) блока order в родительский класс Component
+
+Класс для отрисовки списка карточек товаров.
+
+class Gallery () {
+    catalogElement: HTMLElement;
+}
+
+    Поля класса:
+        * хранит каталог (карточки товаров)
+  
+
+    Методы класса:
+        * отвечает за отображение списка карточек товаров
+         set catalog(items: HTMLElement[])
+
+    constructor(container: HTMLElement) - Передает контейнер (HTML-элемент) блока gallery в родительский класс Component
+
+
+Класс отрисовки корзины (кнопка открытия корзины и колличество товаров в ней)
+
+class Header() {
+    counterElement: HTMLElement;
+    basketButton: HTMLButtonElement;
+}
+
+    Поля класса:
+        * хранит кнопку открытия корзины
+        * хранит 
+
+    Методы класса:
+        * отвечает за устанавливку количества товаров в корзине и обновляет отображение счетчика
+         set counter(value: number)  
+
+    constructor(container: HTMLElement, protected events: IEvents) - Привязывает клик для открытия корзины и передает контейнер (HTML-элемент) блока header в родительский класс Component
+
+Класс отвечает за отображение модального окна и его содержимого. 
+Управляет открытием, закрытием и отображением содержимого модального окна.
+
+class Modal () {
+    contentModal: HTMLElement;
+    closeModal: HTMLElement;
+}
+
+    Поля класса:
+        * хранит кнопку закрытия модального окна
+        * хранит контейнер для отображения содержимого модального окна
+
+    Методы класса:
+        * отвечает за устанавку содержимого модального окна
+         set content(value: HTMLElement)
+
+    constructor(container: HTMLElement) - Хранит контейнер для отображения содержимого модального окна.
+
+
+Класс отрисовывает форму выбора способа оплаты и ввода адреса доставки.
+
+class OrderForm  () {
+    cardOrderButton: HTMLButtonElement;
+    cashOrderButton: HTMLButtonElement;
+    addressOrderInput: HTMLInputElement;
+}
+
+    Поля класса:
+        * хранит кнопку выбора оплаты банковской картой
+        * хранит кнопку выбора оплаты при получении
+
+    Методы класса:
+        * отвечает за устанавку выбранного способ оплаты.
+         set payment(value: TPayment | "") 
+        * отвечает за устанавливку адрес доставки
+        set address(value: string)
+
+    constructor(container: HTMLElement, actions?: IOrderFormActions)  - Принимает корневой HTML-элемент блока order и привязывает ввод
+
+Класс отвечает за отрисовку окна подтверждения успешного заказа.
+
+class OrderSuccess () {
+    successOrderCheck: HTMLElement;
+    successOrderButton: HTMLButtonElement;
+}
+
+    Поля класса:
+        * хранит кнопку перенаправляющую в каталог товаров
+        * хранит элемент с текстом и суммой заказа
+
+    Методы класса:
+        * отвечает за устанавку суммы заказа
+         set description(value: string) 
+
+    constructor(container: HTMLElement, actions?: ISuccessActions) - Принимает корневой HTML-элемент блока success и привязывает клик onClose
+
+
+#### Список событий:
+
+Список событий
+Взаимодействие между компонентами модели и представления происходит через события, которые обрабатываются в файле main.ts. Ниже приведен список всех событий, используемых в проекте.
+
+События изменения данных
+catalog: changed;
+Инициируется при изменении списка товаров в каталоге. По этому событию перерисовывается галерея карточек товаров.
+
+basket: changed;
+Инициируется при изменении содержимого корзины. По этому событию обновляется отображение корзины, ее итоговая стоимость и счетчик товаров в шапке сайта.
+
+buyer: changed;
+Инициируется при изменении данных покупателя. По этому событию обновляются поля форм заказа и контактов, а также проверяется их валидность.
+
+События взаимодействия пользователя с интерфейсом
+card: select;
+Инициируется при выборе карточки товара в каталоге. Передает выбранный товар в модель каталога для последующего отображения в модальном окне.
+
+basket: toggle;
+Инициируется при нажатии на кнопку добавления/удаления товара в превью карточки. В зависимости от наличия товара в корзине, добавляет его в корзину либо удаляет из нее.
+
+basket: remove;
+Инициируется при нажатии на кнопку удаления товара внутри корзины. Удаляет переданный товар из корзины.
+
+basket: open;
+Инициируется при открытии корзины. Отображает модальное окно с содержимым корзины.
+
+order: open;
+Инициируется при переходе к оформлению заказа. Отображает модальное окно с формой выбора способа оплаты и адреса доставки.
+
+contacts: open;
+Инициируется при переходе от формы заказа к форме контактов. Отображает модальное окно с формой ввода email и телефона покупателя.
+
+События отображения
+preview: changed;
+Инициируется при выборе товара для подробного просмотра. Отображает модальное окно с подробной информацией о товаре и соответствующим состоянием кнопки действия.
