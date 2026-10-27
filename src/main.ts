@@ -4,7 +4,7 @@ import { Products } from "./components/Models/Products.ts";
 import { Buyer } from "./components/Models/Buyer.ts";
 import { Basket } from "./components/Models/Basket.ts";
 import {Api} from "./components/base/Api.ts";
-import {API_URL} from "./utils/constants.ts";
+import {API_URL, CDN_URL} from "./utils/constants.ts";
 import { Server } from "./components/Models/Server.ts";
 import {Header} from "./components/Views/Header.ts";
 import {ensureElement} from "./utils/utils.ts";
@@ -39,8 +39,15 @@ const server = new Server(api);
 server
     .getProduct()
     .then((products) => {
-        productsModel.saveProducts(products.items);
-        console.log(`Список товаров с сервера`, productsModel.getProducts());
+        // Модифицируем путь к картинке для каждого продукта до сохранения в модель
+        const updatedItems = products.items.map((item) => ({
+            ...item,
+            image: CDN_URL + item.image,
+        }));
+
+        // Сохраняем уже измененный список товаров в модель
+        productsModel.saveProducts(updatedItems);
+        console.log(`Список товаров с сервера (с обновленными путями):`, productsModel.getProducts());
     })
     .catch((err) => {
         console.error(`Товары не загружены:`, err);
@@ -65,8 +72,12 @@ const gallery = new Gallery(galleryContainer);
 const modal = new Modal(modalContainer);
 const orderSuccess = new OrderSuccess(cloneTemplate(OrderSuccessTemplate), {
     onClose: () => {
-        modal.close();
+        events.emit("success:close");
     },
+});
+
+events.on("success:close", () => {
+    modal.close();
 });
 
 const basket = new BasketViews(cloneTemplate(basketViewsTemplate), {
@@ -94,15 +105,20 @@ events.on<IProduct>("card:select", (item) => {
     productsModel.saveSelectProduct(item);
 });
 
-const preview = new CardPreview(cloneTemplate(CatalogPreviewTemplate), {
-    onToggle: () => {
-        const product = productsModel.getSelectProduct();
+const preview = new CardPreview(cloneTemplate(CatalogPreviewTemplate), events);
 
-        if (product) {
-            events.emit("basket:toggle", product);
-            modal.close();
+events.on("preview:toggle", () => {
+    const product = productsModel.getSelectProduct();
+
+    if (product) {
+        if (basketModel.getBasketProductById(product.id)) {
+            basketModel.deleteBasketProduct(product);
+        } else {
+            basketModel.addBasketProduct(product);
         }
-    },
+        
+        modal.close();
+    }
 });
 
 // Обновление модального окна с деталями товара.
@@ -129,14 +145,6 @@ events.on("preview:changed", () => {
     modal.open();
 });
 
-// Переключение состояния товара в корзине.
-events.on<IProduct>("basket:toggle", (item) => {
-    if (basketModel.getBasketProductById(item.id)) {
-        basketModel.deleteBasketProduct(item);
-    } else {
-        basketModel.addBasketProduct(item);
-    }
-});
 
 // Начальная инициализация корзины.
 basket.buttonDisabled = true;

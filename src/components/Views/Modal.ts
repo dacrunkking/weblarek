@@ -1,11 +1,11 @@
 import { IModal } from "../../types";
-import {Component} from "../base/Component.ts";
-import {ensureElement} from "../../utils/utils.ts";
-
+import { Component } from "../base/Component.ts";
+import { ensureElement } from "../../utils/utils.ts";
 
 export class Modal extends Component<IModal> {
     protected contentModal: HTMLElement;
     protected closeModal: HTMLElement;
+
     constructor(container: HTMLElement) {
         super(container);
 
@@ -16,11 +16,18 @@ export class Modal extends Component<IModal> {
             this.close();
         });
 
+        this.container.addEventListener("click", (event) => {
+            if (event.target === this.container) {
+                this.close();
+            }
+        });
     }
+
     set content(value: HTMLElement) {
         this.contentModal.replaceChildren();
         this.contentModal.append(value);
     }
+
     open() {
         this.container.classList.add("modal_active");
     }

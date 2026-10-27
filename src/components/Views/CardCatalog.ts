@@ -1,12 +1,12 @@
 import { IProduct } from "../../types";
-import { categoryMap, CDN_URL } from "../../utils/constants";
+import { categoryMap } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { Card } from "./Card";
 import { ICardActions, CategoryKey } from "../../types";
 
-
-
-export type TCardCatalog = Pick<IProduct, "image" | "category">;
+export type TCardCatalog = Omit<IProduct, "image"> & {
+    image: { url: string; alt: string };
+};
 
 export class CardCatalog extends Card<TCardCatalog> {
     protected imageElement: HTMLImageElement;
@@ -39,7 +39,7 @@ export class CardCatalog extends Card<TCardCatalog> {
         }
     }
 
-    set image(value: string) {
-        this.setImage(this.imageElement, CDN_URL + value, this.title);
+    set image(value: { url: string; alt: string }) {
+        this.setImage(this.imageElement, value.url, value.alt);
     }
 }

@@ -79,7 +79,7 @@ export interface ICardPreviewActions {
 
 export type TCardPreview = Pick<IProduct, "image" | "category" | "description">;
 
-export type TCardBasket = Pick<IProduct, "id"> & {
+export type TCardBasket = {
     index: number;
 };
 
