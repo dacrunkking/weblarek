@@ -1,10 +1,9 @@
 import { IHeader } from "../../types";
-import {Component} from "../base/Component.ts";
-import {IEvents} from "../base/Events.ts";
-import {ensureElement} from "../../utils/utils.ts";
+import { Component } from "../base/Component.ts";
+import { IEvents } from "../base/Events.ts";
+import { ensureElement } from "../../utils/utils.ts";
 
-
-export class Header extends Component<IHeader>{
+export class Header extends Component<IHeader> {
     protected counterElement: HTMLElement;
     protected basketButton: HTMLButtonElement;
 
@@ -18,8 +17,12 @@ export class Header extends Component<IHeader>{
             this.events.emit('basket:open');
         });
 
+        this.counter = 0; 
     }
+
     set counter(value: number) {
-        this.counterElement.textContent = String(value);
+        if (this.counterElement) {
+            this.counterElement.textContent = String(value);
+        }
     }
 }

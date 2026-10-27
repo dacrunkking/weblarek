@@ -93,8 +93,18 @@ events.on("catalog:changed", () => {
                 events.emit("card:select", item);
             },
         });
-        return card.render(item);
+        
+        return card.render({
+            title: item.title,
+            price: item.price,
+            category: item.category,
+            image: {
+                url: item.image,       
+                alt: item.title        
+            }
+        });
     });
+    
     gallery.render({
         catalog: itemCards,
     });
@@ -145,11 +155,6 @@ events.on("preview:changed", () => {
     modal.open();
 });
 
-
-// Начальная инициализация корзины.
-basket.buttonDisabled = true;
-basket.price = '0';
-
 // Обновление корзины при изменении.
 events.on("basket:changed", () => {
     basket.buttonDisabled = basketModel.getBasketProducts().length === 0;
@@ -180,12 +185,12 @@ events.on("basket:open", () => {
 });
 
 const order = new OrderForm(cloneTemplate(OrderFormTemplate), {
-    onPayment: (payment) => {
+    onPayment: (payment: string) => {
         // эмитим событие, а не напрямую вызываем метод модели
-        events.emit("buyer:payment", payment);
+        events.emit("buyer:payment", {payment});
     },
     onAddress: (address) => {
-        events.emit("buyer:address", address);
+        events.emit("buyer:address", {address});
     },
     onSubmit: () => {
         events.emit("contacts:open");
@@ -193,12 +198,12 @@ const order = new OrderForm(cloneTemplate(OrderFormTemplate), {
 });
 
 // Обработчики для сохранения данных покупателя
-events.on("buyer:payment", (payment) => {
-    buyerModel.saveBuyerPayment(payment);
+events.on<{ payment: string }>("buyer:payment", (data) => {
+    buyerModel.saveBuyerPayment(data.payment as TPayment);
 });
 
-events.on("buyer:address", (address) => {
-    buyerModel.saveBuyerAddress(address);
+events.on<{ address: string }>("buyer:address", (data) => {
+    buyerModel.saveBuyerAddress(data.address);
 });
 
 // Обработчик события order:open:

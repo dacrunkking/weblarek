@@ -1,4 +1,4 @@
-import {categoryMap} from "../utils/constants.ts";
+import { categoryMap } from "../utils/constants.ts";
 
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
@@ -47,7 +47,7 @@ export interface IHeader {
 }
 
 export interface IGallery {
-    catalog: HTMLElement [];
+    catalog: HTMLElement[];
 }
 
 export interface IModal {
@@ -71,10 +71,6 @@ export type CategoryKey = keyof typeof categoryMap;
 
 export interface ICardActions {
     onClick: () => void;
-}
-
-export interface ICardPreviewActions {
-    onToggle: () => void;
 }
 
 export type TCardPreview = Pick<IProduct, "image" | "category" | "description">;

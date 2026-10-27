@@ -1,7 +1,8 @@
-import { CategoryKey, ICardPreviewActions, TCardPreview } from "../../types";
+import { CategoryKey, TCardPreview } from "../../types";
 import { Card } from "./Card.ts";
 import { ensureElement } from "../../utils/utils.ts";
 import { categoryMap } from "../../utils/constants.ts";
+import { IEvents } from "../base/Events.ts";
 
 export class CardPreview extends Card<TCardPreview> {
     protected imageElement: HTMLImageElement;
@@ -9,7 +10,7 @@ export class CardPreview extends Card<TCardPreview> {
     protected descriptionElement: HTMLElement;
     protected buttonElement: HTMLButtonElement;
 
-    constructor(container: HTMLElement, action?: ICardPreviewActions) {
+    constructor(container: HTMLElement, events: IEvents) {
         super(container);
 
         this.imageElement = ensureElement<HTMLImageElement>(".card__image", this.container);
@@ -17,8 +18,10 @@ export class CardPreview extends Card<TCardPreview> {
         this.descriptionElement = ensureElement<HTMLElement>('.card__text', this.container);
         this.buttonElement = ensureElement<HTMLButtonElement>(".card__button", this.container);
 
-        if (action?.onToggle) {
-            this.buttonElement.addEventListener("click", action.onToggle);
+        if (this.buttonElement) {
+            this.buttonElement.addEventListener("click", () => {
+                events.emit("preview:toggle");
+            });
         }
     }
 
