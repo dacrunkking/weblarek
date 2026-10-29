@@ -223,7 +223,7 @@ function viewOrderSuccess(data: { total: number }) {
     modal.open();
 }
 
-// Инициализация формы контактов через событийную модель (исправлено по замечанию ревьюера)
+// Инициализация формы контактов через событийную модель
 const contacts = new ContactForm(cloneTemplate(contactsFormTemplate), {
     onEmail(email) {
         events.emit("buyer:email", { email });
