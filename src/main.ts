@@ -3,34 +3,33 @@ import './scss/styles.scss';
 import { Products } from "./components/Models/Products.ts";
 import { Buyer } from "./components/Models/Buyer.ts";
 import { Basket } from "./components/Models/Basket.ts";
-import {Api} from "./components/base/Api.ts";
-import {API_URL, CDN_URL} from "./utils/constants.ts";
+import { Api } from "./components/base/Api.ts";
+import { API_URL, CDN_URL } from "./utils/constants.ts";
 import { Server } from "./components/Models/Server.ts";
-import {Header} from "./components/Views/Header.ts";
-import {ensureElement} from "./utils/utils.ts";
-import {EventEmitter} from "./components/base/Events.ts";
-import { Gallery} from "./components/Views/Gallery.ts";
+import { Header } from "./components/Views/Header.ts";
+import { ensureElement } from "./utils/utils.ts";
+import { EventEmitter } from "./components/base/Events.ts";
+import { Gallery } from "./components/Views/Gallery.ts";
 import { Modal } from "./components/Views/Modal.ts";
 import { CardCatalog } from "./components/Views/CardCatalog.ts";
 import { cloneTemplate } from "./utils/utils";
 // import {Card} from "./components/Views/Card.ts";
 import { IProduct } from "./types";
-import { CardPreview} from "./components/Views/CardPreview.ts";
+import { CardPreview } from "./components/Views/CardPreview.ts";
 import { BasketViews } from "./components/Views/Basket";
-import {CardBasket} from "./components/Views/CardBasket.ts";
+import { CardBasket } from "./components/Views/CardBasket.ts";
 import { OrderSuccess } from "./components/Views/OrderSuccess";
 import { ContactForm } from "./components/Views/ContactForm.ts";
-import { OrderForm} from "./components/Views/OrderForm.ts";
+import { OrderForm } from "./components/Views/OrderForm.ts";
 import { TPayment } from "./types";
 
 // Создание экземпляров класса моделей (инициализация)
 const events = new EventEmitter();
 const buyerModel = new Buyer(events);
-console.log(`Данные покупателя`, {buyerModel});
+console.log(`Данные покупателя`, { buyerModel });
 const basketModel = new Basket(events);
-console.log(`Корзина создана`, {basketModel});
+console.log(`Корзина создана`, { basketModel });
 const productsModel = new Products(events);
-
 
 // Настройка взаимодействия с сервером
 const api = new Api(API_URL);
@@ -53,12 +52,11 @@ server
         console.error(`Товары не загружены:`, err);
     });
 
-
 // Получение ДОМ элементов (инициализация контейнеров)
-const headerContainer = ensureElement<HTMLElement>('.header')
+const headerContainer = ensureElement<HTMLElement>('.header');
 const galleryContainer = ensureElement<HTMLElement>(".gallery");
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
-const CatalogPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
+const сatalogPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
 const modalContainer = ensureElement<HTMLElement>("#modal-container");
 const basketViewsTemplate = ensureElement<HTMLTemplateElement>("#basket");
 const basketCardTemplate = ensureElement<HTMLTemplateElement>("#card-basket");
@@ -81,9 +79,11 @@ events.on("success:close", () => {
 });
 
 const basket = new BasketViews(cloneTemplate(basketViewsTemplate), {
-    onOrder: () => {console.log('Order clicked!');
-        events.emit("order:open")
-}});
+    onOrder: () => {
+        console.log('Order clicked!');
+        events.emit("order:open");
+    }
+});
 
 // Обновление галереи товаров при изменении каталога. Обработка клика по товарной карточке.
 events.on("catalog:changed", () => {
@@ -115,7 +115,7 @@ events.on<IProduct>("card:select", (item) => {
     productsModel.saveSelectProduct(item);
 });
 
-const preview = new CardPreview(cloneTemplate(CatalogPreviewTemplate), events);
+const preview = new CardPreview(cloneTemplate(сatalogPreviewTemplate), events);
 
 events.on("preview:toggle", () => {
     const product = productsModel.getSelectProduct();
@@ -172,7 +172,7 @@ events.on("basket:changed", () => {
     // Обновление UI
     basket.items = basketCardItems;
     header.counter = basketCardItems.length;
-})
+});
 
 events.on<IProduct>("basket:remove", (product) => {
     basketModel.deleteBasketProduct(product);
@@ -187,10 +187,10 @@ events.on("basket:open", () => {
 const order = new OrderForm(cloneTemplate(OrderFormTemplate), {
     onPayment: (payment: string) => {
         // эмитим событие, а не напрямую вызываем метод модели
-        events.emit("buyer:payment", {payment});
+        events.emit("buyer:payment", { payment });
     },
     onAddress: (address) => {
-        events.emit("buyer:address", {address});
+        events.emit("buyer:address", { address });
     },
     onSubmit: () => {
         events.emit("contacts:open");
@@ -223,34 +223,48 @@ function viewOrderSuccess(data: { total: number }) {
     modal.open();
 }
 
-// Инициализация формы и сбор данных покупателя.
+// Инициализация формы контактов через событийную модель (исправлено по замечанию ревьюера)
 const contacts = new ContactForm(cloneTemplate(contactsFormTemplate), {
     onEmail(email) {
-        buyerModel.saveBuyerEmail(email);
+        events.emit("buyer:email", { email });
     },
 
     onPhone(phone) {
-        buyerModel.saveBuyerPhone(phone);
+        events.emit("buyer:phone", { phone });
     },
 
     onSubmit() {
-        const buyerData = buyerModel.getBuyerData();
-
-        const orderData = {
-            ...buyerData,
-            total: basketModel.getBasketTotal(),
-            items: basketModel.getBasketProducts().map((item) => item.id),
-        };
-        // Отправка заказа на сервер.
-        server
-            .postOrder(orderData)
-            .then((result) => {
-                viewOrderSuccess(result);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        events.emit("order:submit");
     },
+});
+
+// Слушатели событий для обработки ввода в форме контактов и отправки данных на сервер
+events.on<{ email: string }>("buyer:email", (data) => {
+    buyerModel.saveBuyerEmail(data.email);
+});
+
+events.on<{ phone: string }>("buyer:phone", (data) => {
+    buyerModel.saveBuyerPhone(data.phone);
+});
+
+events.on("order:submit", () => {
+    const buyerData = buyerModel.getBuyerData();
+
+    const orderData = {
+        ...buyerData,
+        total: basketModel.getBasketTotal(),
+        items: basketModel.getBasketProducts().map((item) => item.id),
+    };
+
+    // Отправка заказа на сервер
+    server
+        .postOrder(orderData)
+        .then((result) => {
+            viewOrderSuccess(result);
+        })
+        .catch((err) => {
+            console.error("Ошибка при отправке заказа:", err);
+        });
 });
 
 // Открываем модальное окно и динамически рендерим форму.
@@ -258,7 +272,6 @@ events.on("contacts:open", () => {
     modal.content = contacts.render();
     modal.open();
 });
-
 
 // Валидируем данные и обновляем форму.
 events.on("buyer:changed", () => {
